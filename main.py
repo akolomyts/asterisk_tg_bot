@@ -78,11 +78,6 @@ def big_dir(message):
 
 
 ## Пошук відповідального менеджера в CRM Sales Drive.
-@bot.message_handler(commands=['get_manager'])
-def get_manager(message):
-    bot.send_message(message.chat.id, "Введіть номер телефону клієнта:")
-    bot.register_next_step_handler(message, process_phone_number)
-
 def normalize_phone_number(phone_number):
     # Удаление всех символов, кроме цифр, пробелов, круглых скобок и дефисов
     cleaned_number = re.sub(r'[^\d\s()\-.]', '', phone_number)
@@ -126,6 +121,12 @@ def process_phone_number(message):
     else:
         get_manager()
         bot.send_message(message.chat.id, "Некоректний номер телефону!")
+
+@bot.message_handler(commands=['get_manager'])
+def get_manager(message):
+    bot.send_message(message.chat.id, "Введіть номер телефону клієнта:")
+    bot.register_next_step_handler(message, process_phone_number)
+
 
 #"/pbx_peers"
 @bot.message_handler(commands=['pbx_peers'])
