@@ -1,16 +1,15 @@
 import os
 import telebot
 import requests
-from telebot import types  # Импортируем классы для создания клавиатур
+from telebot import types  # Імпортуємо класи для створення клавіатури
 #from kb import kb_main, kb_status, kb_command, gen_markup
 
-# Получаем значение токена из переменных окружения
-TOKEN = "6395262263:AAEZRhi9tYytq8sEZ0lOvh1tYad016nAHFo"
+# Отримуємо значення токена зі змінних оточення
+TOKEN = "<YOUR_TG_TOKEN>"
 
-# Создаем объект бота
 bot = telebot.TeleBot(TOKEN)
 
-# Создаем клавиатуру с кнопками
+# Створюємо клавіатуру з кнопками
 keyboard = types.ReplyKeyboardMarkup(row_width=4, resize_keyboard=True)
 buttons = [
     "/help", "/userid", "/server_info", "/size_rec",
@@ -22,22 +21,22 @@ keyboard.add(*buttons)
 @bot.message_handler(commands=['start', 'help'])
 def start(message):
     text_help='''Cписок доступных команд:
-    /help - справка по командам
-    /userid - id пользователя
-    /server_info - краткая информация о сервере
-    /size_rec - размер папки с аудиозаписями
-    /get_manager - узнать кто менеджер (salesdrive)
-    /pbx_peers - активные внутренние/внешине номера
-    /pbx_queue - статистика менеджеров в очереди
-    /last_calls - несколько последних звонков'''
-    bot.send_message(message.chat.id, f"Привет!\nЯ бот 🤖 для управления сервером. Вот доступные команды: \n{text_help}", reply_markup=keyboard)
+    /help - довідка по командам
+    /userid - ID користувача
+    /server_info - коротка інформація про сервер
+    /size_rec - розмір папки з аудіозаписами
+    /get_manager - дізнатися хто менеджер (salesdrive)
+    /pbx_peers - активні внутрішні/зовнішній номера
+    /pbx_queue - статистика менеджерів у черзі
+    /last_calls - декілька останніх дзвінків'''
+    bot.send_message(message.chat.id, f"Привіт!\nЯ телеграм бот 🤖 і можу надати деяку інформацію по серверу. Ось наявні команды: \n{text_help}", reply_markup=keyboard)
 
 @bot.message_handler(commands=['userid'])
 def userid(message):
     user_id = message.from_user.id
-    bot.send_message(message.chat.id, f"Ваш ID пользователя: {user_id}")
+    bot.send_message(message.chat.id, f"Ваш ID користувача: {user_id}")
 
-## Краткая информацио о сервере
+## Коротка інформація про сервер
 @bot.message_handler(commands=['server_info'])
 def server_info(message):
     hostname = os.popen("hostname").read().strip()
@@ -51,7 +50,6 @@ def server_info(message):
     system_uptime = os.popen("uptime | sed 's/.*up \\([^,]*\\), .*/\\1/'").read().strip()
     ip_address = os.popen("hostname -I | awk '{print $1}'").read().strip()
 
-    # Build the message
     srv_info = """
     <code>[  {} Server info  ]</code>
     
@@ -68,30 +66,30 @@ def server_info(message):
     bot.send_message(message.chat.id, srv_info, parse_mode="HTML")
 
 
-## Размер директории с записями разговора
+## Розмір директорії із записами розмови
 @bot.message_handler(commands=['size_rec'])
 def size_rec(message):
     mondir_size = os.popen("du -h --max-depth=2 /var/spool/asterisk/monitor/ | sort -k2").read().strip()
-    bot.send_message(message.chat.id, f"<code>[ Размер директорий с записями разговора ]\n\n{mondir_size}</code>", parse_mode="HTML")
+    bot.send_message(message.chat.id, f"<code>[ Розмір директорій із записами розмови ]\n\n{mondir_size}</code>", parse_mode="HTML")
 
 
-## Список наибОльших директорий
+## Список найбільших директорій
 @bot.message_handler(commands=['big_dir'])
 def big_dir(message):
     bigdir_size = os.popen("du -h -d2 --exclude=proc / | sort -k2 | egrep '^([0-9]{2,3}|[0-9]{1}.[0-9]{1})G'").read().strip()
-    bot.send_message(message.chat.id, f"<code>[ Список наибОльших директорий ]\n\n{bigdir_size}</code>", parse_mode="HTML")
+    bot.send_message(message.chat.id, f"<code>[ Список найбільших директорій ]\n\n{bigdir_size}</code>", parse_mode="HTML")
 
 
-## Поиск ответственного менеджера в CRMке Sales Drive.
+## Пошук відповідального менеджера в CRM Sales Drive.
 @bot.message_handler(commands=['get_manager'])
 def get_manager(message):
-    bot.send_message(message.chat.id, "Введите номер телефона:")
+    bot.send_message(message.chat.id, "Введіть номер телефону клієнта:")
     bot.register_next_step_handler(message, process_phone_number)
 
 def process_phone_number(message):
     phone_number = message.text
-    headers = {"Form-Api-Key": "jS1dfsEWv8qofWtrNXCjCLg2nZFruAaukOAtLFAuKNJ3_LXcQuGx6diFGEQshncSt2kPmr"}
-    url = f"https://proftechnika.salesdrive.me/api/get_manager_by_phone_number/?phone={phone_number}"
+    headers = {"Form-Api-Key": "<Salesdrive API Key>"}
+    url = f"https://<your_domain>.salesdrive.me/api/get_manager_by_phone_number/?phone={phone_number}"
 
     response = requests.get(url, headers=headers)
     data = response.json()
@@ -99,16 +97,16 @@ def process_phone_number(message):
     if data["status"] == "success":
         manager = data["manager"]
         client = data["client"]
-        manager_name = manager.get("name", "Неизвестно")
-        internal_number = manager.get("internal_number", "Неизвестно")
+        manager_name = manager.get("name", "Невідомо")
+        internal_number = manager.get("internal_number", "Невідомо")
         client_name = f"{client.get('fName', 'Unknown')} {client.get('lName', '')}"
 
-        result_message = f"ФИО: {client_name}\nОтветственный: {manager_name} [{internal_number}]"
+        result_message = f"ФИО: {client_name}\nВідповідальний: {manager_name} [{internal_number}]"
         bot.send_message(message.chat.id, result_message)
     elif data["status"] == "error" and data["massage"] == "Not found.":
-        bot.send_message(message.chat.id, "Нет заявок или контактов с этим номером.")
+        bot.send_message(message.chat.id, "Немає заявок або контактів із цим номером.")
     else:
-        bot.send_message(message.chat.id, "Не удалось получить информацию о менеджере.")
+        bot.send_message(message.chat.id, "Неможливо отримати інформацію про менеджера.")
 
 #"/pbx_peers"
 @bot.message_handler(commands=['pbx_peers'])
@@ -121,7 +119,7 @@ def pbx_peers(message):
 
 {}
 
-[  Статус вн номерів АТС  ]
+[  Статус внутрішніх номерів АТС  ]
 
 {}</code>
   """.format(peers1, peers2)
@@ -134,7 +132,6 @@ def pbx_peers(message):
 def pbx_queue(message):
     queues = [510]
     for queue in queues:
-#        queue1 = os.popen("/usr/sbin/asterisk -rx"queue show {queue}" | head -n -1 | tail -n -3 | sed -e 's/([^()]*)//g' | awk '{print $1, $5, $6}'").read().strip()
         queue1 = os.popen(f"/usr/sbin/asterisk -rx'queue show {queue}' | head -n -1 | tail -n -3 | sed -e 's/([^()]*)//g' | awk '{{print $1, $5, $6}}'").read().strip()
         queue_info = f"<code>[  Статистика черги {queue}  ]\n {queue1} </code>"
         bot.send_message(message.chat.id, queue_info, parse_mode="HTML")
