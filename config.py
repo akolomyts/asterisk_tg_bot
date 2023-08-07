@@ -1,4 +1,3 @@
-TOKEN = "<Telegram Bot Token>"
-FORM_API_KEY = "<SalesDrive API KEY>"
-YOUR_DOMAIN = "<only_domain>"
-
+TOKEN = "6395262263:AAEZRhi9tYytq8sEZ0lOvh1tYad016nAHFo"
+FORM_API_KEY = "jS1dfsEWv8qofWtrNXCjCLg2nZFruAaukOAtLFAuKNJ3_LXcQuGx6diFGEQshncSt2kPmr"
+YOUR_DOMAIN = "proftechnika"

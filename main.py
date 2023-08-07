@@ -1,6 +1,7 @@
 import os
 import telebot
 import requests
+import re
 from telebot import types  # Імпортуємо класи для створення клавіатури
 from config import TOKEN, FORM_API_KEY, YOUR_DOMAIN
 
@@ -84,25 +85,29 @@ def get_manager(message):
 
 def process_phone_number(message):
     phone_number = message.text
-    headers = {"Form-Api-Key": "FORM_API_KEY"}
-    url = f"https://YOUR_DOMAIN.salesdrive.me/api/get_manager_by_phone_number/?phone={phone_number}"
+    if re.match(r'^[+380]?[0-9]{9}( |-)?$', phone_number):
+        headers = {"Form-Api-Key": "FORM_API_KEY"}
+        url = f"https://YOUR_DOMAIN.salesdrive.me/api/get_manager_by_phone_number/?phone={phone_number}"
 
-    response = requests.get(url, headers=headers)
-    data = response.json()
+        response = requests.get(url, headers=headers)
+        data = response.json()
 
-    if data["status"] == "success":
-        manager = data["manager"]
-        client = data["client"]
-        manager_name = manager.get("name", "Невідомо")
-        internal_number = manager.get("internal_number", "Невідомо")
-        client_name = f"{client.get('fName', 'Unknown')} {client.get('lName', '')}"
+        if data["status"] == "success":
+            manager = data["manager"]
+            client = data["client"]
+            manager_name = manager.get("name", "Невідомо")
+            internal_number = manager.get("internal_number", "Невідомо")
+            client_name = f"{client.get('fName', 'Unknown')} {client.get('lName', '')}"
 
-        result_message = f"ФИО: {client_name}\nВідповідальний: {manager_name} [{internal_number}]"
-        bot.send_message(message.chat.id, result_message)
-    elif data["status"] == "error" and data["massage"] == "Not found.":
-        bot.send_message(message.chat.id, "Немає заявок або контактів із цим номером.")
+            result_message = f"ФИО: {client_name}\nВідповідальний: {manager_name} [{internal_number}]"
+            bot.send_message(message.chat.id, result_message)
+        elif data["status"] == "error" and data["massage"] == "Not found.":
+            bot.send_message(message.chat.id, "Немає заявок або контактів із цим номером.")
+        else:
+            bot.send_message(message.chat.id, "Неможливо отримати інформацію про менеджера.")
     else:
-        bot.send_message(message.chat.id, "Неможливо отримати інформацію про менеджера.")
+        print("Невірний формат номера")
+        get_manager()
 
 #"/pbx_peers"
 @bot.message_handler(commands=['pbx_peers'])
