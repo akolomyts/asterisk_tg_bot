@@ -99,12 +99,12 @@ def process_phone_number(message):
         internal_number = manager.get("internal_number", "Невідомо")
         client_name = f"{client.get('fName', 'Unknown')} {client.get('lName', '')}"
 
-        result_message = f"ФИО: {client_name}\nВідповідальний: {manager_name} [{internal_number}]"
-        bot.reply_to(message, result_message)
+        result_message = f"ПІБ: {client_name}\nВідповідальний: {manager_name} [{internal_number}]"
+        bot.send_message(message.chat.id, result_message)
     elif data["status"] == "error" and data["massage"] == "Not found.":
-        bot.reply_to(message, "Немає заявок або контактів із цим номером.")
+        bot.send_message(message.chat.id, "Немає заявок або контактів із цим номером.")
     else:
-        bot.reply_to(message, "Неможливо отримати інформацію про менеджера.")
+        bot.send_message(message.chat.id, "Неможливо отримати інформацію про менеджера.")
         
 
 #"/pbx_peers"
