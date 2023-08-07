@@ -2,10 +2,7 @@ import os
 import telebot
 import requests
 from telebot import types  # Імпортуємо класи для створення клавіатури
-#from kb import kb_main, kb_status, kb_command, gen_markup
-
-# Отримуємо значення токена зі змінних оточення
-TOKEN = "<YOUR_TG_TOKEN>"
+from config import TOKEN, FORM_API_KEY, YOUR_DOMAIN
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -88,8 +85,8 @@ def get_manager(message):
 
 def process_phone_number(message):
     phone_number = message.text
-    headers = {"Form-Api-Key": "<Salesdrive API Key>"}
-    url = f"https://<your_domain>.salesdrive.me/api/get_manager_by_phone_number/?phone={phone_number}"
+    headers = {"Form-Api-Key": "FORM_API_KEY"}
+    url = f"https://YOUR_DOMAIN.salesdrive.me/api/get_manager_by_phone_number/?phone={phone_number}"
 
     response = requests.get(url, headers=headers)
     data = response.json()
