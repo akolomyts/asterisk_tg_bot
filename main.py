@@ -81,11 +81,29 @@ def big_dir(message):
 @bot.message_handler(commands=['get_manager'])
 def get_manager(message):
     bot.send_message(message.chat.id, "Введіть номер телефону клієнта:")
-    bot.register_next_step_handler(message, process_phone_number)
+    bot.register_next_step_handler(message, normalize_phone_number)
 
-def process_phone_number(message):
+def normalize_phone_number(message):
+    # Удаление всех символов, кроме цифр, пробелов, круглых скобок и дефисов
+    cleaned_number = re.sub(r'[^\d\s()\-.]', '', message)
+    
+    # Извлечение только цифр из номера
+    digits = re.sub(r'\D', '', cleaned_number)
+    
+    # Проверка наличия 9 цифр
+    if len(digits) == 9:
+        # Форматирование номера
+        formatted_number = f'+380{digits}'
+        bot.send_message(message.chat.id, f"Відформатований номер {formatted_number}")
+        bot.register_next_step_handler(message, process_phone_number)
+ #       return formatted_number
+    else:
+        bot.send_message(message.chat.id, "Невірний формат номера")
+        get_manager()
+
+def process_phone_number(formatted_number):
     phone_number = message.text
-    if re.match(r'^[+380]?[0-9]{9}( |-)?$', phone_number):
+    if re.match(r'^\+?38[0-9\s()-]{8,}$', phone_number):
         headers = {"Form-Api-Key": "FORM_API_KEY"}
         url = f"https://YOUR_DOMAIN.salesdrive.me/api/get_manager_by_phone_number/?phone={phone_number}"
 
@@ -106,8 +124,7 @@ def process_phone_number(message):
         else:
             bot.send_message(message.chat.id, "Неможливо отримати інформацію про менеджера.")
     else:
-        print("Невірний формат номера")
-        get_manager()
+
 
 #"/pbx_peers"
 @bot.message_handler(commands=['pbx_peers'])
