@@ -8,7 +8,7 @@ from config import TOKEN, FORM_API_KEY, YOUR_DOMAIN, PBX_QUEUES
 bot = telebot.TeleBot(TOKEN)
 
 # Створюємо клавіатуру з кнопками
-keyboard = types.ReplyKeyboardMarkup(row_width=4, resize_keyboard=True)
+keyboard = types.ReplyKeyboardMarkup(row_width=5, resize_keyboard=True)
 buttons = [
     "/help", "/userid", "/server_info", "/size_rec", "/big_dir"
     "/get_manager", "/pbx_peers", "/pbx_queue", "/last_calls"
