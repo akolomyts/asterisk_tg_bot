@@ -94,6 +94,7 @@ def normalize_phone_number(phone_number):
     if len(digits) == 9:
         # Форматирование номера
         formatted_number = f'+380{digits}'
+        print(formatted_number)
         return formatted_number
     else:
         return None
