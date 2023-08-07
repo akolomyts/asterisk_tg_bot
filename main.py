@@ -22,6 +22,7 @@ def start(message):
     /userid - ID користувача
     /server_info - коротка інформація про сервер
     /size_rec - розмір папки з аудіозаписами
+    /big_dir - найбільші за рзміром директорії
     /get_manager - дізнатися хто менеджер (salesdrive)
     /pbx_peers - активні внутрішні/зовнішній номера
     /pbx_queue - статистика менеджерів у черзі
@@ -99,11 +100,11 @@ def process_phone_number(message):
         client_name = f"{client.get('fName', 'Unknown')} {client.get('lName', '')}"
 
         result_message = f"ФИО: {client_name}\nВідповідальний: {manager_name} [{internal_number}]"
-        bot.send_message(message.chat.id, result_message)
+        bot.reply_to(message, result_message)
     elif data["status"] == "error" and data["massage"] == "Not found.":
-        bot.send_message(message.chat.id, "Немає заявок або контактів із цим номером.")
+        bot.reply_to(message, "Немає заявок або контактів із цим номером.")
     else:
-        bot.send_message(message.chat.id, "Неможливо отримати інформацію про менеджера.")
+        bot.reply_to(message, "Неможливо отримати інформацію про менеджера.")
         
 
 #"/pbx_peers"
