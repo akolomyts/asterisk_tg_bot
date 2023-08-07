@@ -1,0 +1,12 @@
+[Unit]
+Description=Telegram bot
+After=network.target
+
+[Service]
+#ExecStart=/srv/asterisk_tg_bot/start-bot.sh
+ExecStart=/usr/bin/python3 /srv/asterisk_tg_bot/main.py
+
+ExecStop=/bin/kill -s QUIT $MAINPID
+
+[Install]
+WantedBy=multi-user.target
