@@ -3,7 +3,7 @@ import telebot
 import requests
 import re
 from telebot import types  # Імпортуємо класи для створення клавіатури
-from config import TOKEN, FORM_API_KEY, YOUR_DOMAIN
+from config import TOKEN, FORM_API_KEY, YOUR_DOMAIN, PBX_QUEUES
 
 bot = telebot.TeleBot(TOKEN)
 
