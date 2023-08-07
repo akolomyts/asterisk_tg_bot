@@ -78,7 +78,7 @@ def big_dir(message):
 
 
 ## Пошук відповідального менеджера в CRM Sales Drive.
-@bot.message_handler(commands=['get_manager'])
+@bot.message_handler(commands=['get_manager'], func=lambda message: True)
 def get_manager(message):
     bot.send_message(message.chat.id, "Введіть номер телефону клієнта:")
     bot.register_next_step_handler(message, process_phone_number)
