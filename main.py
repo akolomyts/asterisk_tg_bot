@@ -128,7 +128,7 @@ def pbx_peers(message):
 #"/pbx_queue"
 @bot.message_handler(commands=['pbx_queue'])
 def pbx_queue(message):
-    queues = [510]
+    queues = PBX_QUEUES
     for queue in queues:
         queue1 = os.popen(f"/usr/sbin/asterisk -rx'queue show {queue}' | head -n -1 | tail -n -3 | sed -e 's/([^()]*)//g' | awk '{{print $1, $5, $6}}'").read().strip()
         queue_info = f"<code>[  Статистика черги {queue}  ]\n {queue1} </code>"
