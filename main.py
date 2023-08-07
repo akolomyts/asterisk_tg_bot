@@ -95,35 +95,33 @@ def normalize_phone_number(message):
         # Форматирование номера
         formatted_number = f'+380{digits}'
         bot.send_message(message.chat.id, f"Відформатований номер {formatted_number}")
-        bot.register_next_step_handler(message, process_phone_number)
- #       return formatted_number
+        bot.register_next_step_handler(formatted_number, process_phone_number)
+        return formatted_number
     else:
         bot.send_message(message.chat.id, "Невірний формат номера")
         get_manager()
 
 def process_phone_number(formatted_number):
-    phone_number = message.text
-    if re.match(r'^\+?38[0-9\s()-]{8,}$', phone_number):
-        headers = {"Form-Api-Key": "FORM_API_KEY"}
-        url = f"https://YOUR_DOMAIN.salesdrive.me/api/get_manager_by_phone_number/?phone={phone_number}"
+    phone_number = formatted_number.text
+    headers = {"Form-Api-Key": "FORM_API_KEY"}
+    url = f"https://YOUR_DOMAIN.salesdrive.me/api/get_manager_by_phone_number/?phone={phone_number}"
 
-        response = requests.get(url, headers=headers)
-        data = response.json()
+    response = requests.get(url, headers=headers)
+    data = response.json()
 
-        if data["status"] == "success":
-            manager = data["manager"]
-            client = data["client"]
-            manager_name = manager.get("name", "Невідомо")
-            internal_number = manager.get("internal_number", "Невідомо")
-            client_name = f"{client.get('fName', 'Unknown')} {client.get('lName', '')}"
+    if data["status"] == "success":
+        manager = data["manager"]
+        client = data["client"]
+        manager_name = manager.get("name", "Невідомо")
+        internal_number = manager.get("internal_number", "Невідомо")
+        client_name = f"{client.get('fName', 'Unknown')} {client.get('lName', '')}"
 
-            result_message = f"ФИО: {client_name}\nВідповідальний: {manager_name} [{internal_number}]"
-            bot.send_message(message.chat.id, result_message)
-        elif data["status"] == "error" and data["massage"] == "Not found.":
-            bot.send_message(message.chat.id, "Немає заявок або контактів із цим номером.")
-        else:
-            bot.send_message(message.chat.id, "Неможливо отримати інформацію про менеджера.")
+        result_message = f"ФИО: {client_name}\nВідповідальний: {manager_name} [{internal_number}]"
+        bot.send_message(message.chat.id, result_message)
+    elif data["status"] == "error" and data["massage"] == "Not found.":
+        bot.send_message(message.chat.id, "Немає заявок або контактів із цим номером.")
     else:
+        bot.send_message(message.chat.id, "Неможливо отримати інформацію про менеджера.")
 
 
 #"/pbx_peers"
