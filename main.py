@@ -84,7 +84,6 @@ def get_manager(message):
     bot.send_message(message.chat.id, "Введіть номер телефону клієнта:")
     bot.register_next_step_handler(message, process_phone_number)
 
-@bot.message_handler(func=lambda message: True)
 def process_phone_number(message):
     phone_number = message.text.strip()
     if phone_number.startswith('/'):
@@ -114,7 +113,6 @@ def process_phone_number(message):
     else:
         bot.reply_to(message, "Некоректний номер телефону!", reply_markup=keyboard)
 
-@bot.message_handler(func=lambda message: True)
 def normalize_phone_number(phone_number):
     cleaned_number = re.sub(r'^(?:\+?380|0)(\(\)\s-)$', '', phone_number)
     digits = re.sub(r'\D', '', cleaned_number)
@@ -159,10 +157,6 @@ def pbx_queue(message):
 
 #"/last_calls"
 
-        
-@bot.message_handler(func=lambda message: True)
-def echo_all(message):
-    bot.reply_to(message, message.text)
 
 
 def main():
