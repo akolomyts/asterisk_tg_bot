@@ -89,7 +89,7 @@ def process_phone_number(message):
     if phone_number.startswith('/'):
         bot.reply_to(message, "Ви ввели некоректні дані. Будь ласка, введіть правильний номер телефону.")
         return
-    phone_number = normalize_phone_number(message.text):
+    phone_number = normalize_phone_number(message.text)
     if phone_number:
         headers = {"Form-Api-Key": FORM_API_KEY}
         url = f"https://{YOUR_DOMAIN}.salesdrive.me/api/get_manager_by_phone_number/?phone={phone_number}"
