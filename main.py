@@ -32,7 +32,7 @@ def start(message):
 @bot.message_handler(commands=['userid'])
 def userid(message):
     user_id = message.from_user.id
-    bot.send_message(message.chat.id, f"Ваш ID користувача: {user_id}")
+    bot.send_message(message.chat.id, f"Ваш ID користувача: {user_id}", reply_markup=keyboard)
 
 ## Коротка інформація про сервер
 @bot.message_handler(commands=['server_info'])
@@ -61,21 +61,21 @@ def server_info(message):
     """.format(hostname, system_load, number_of_processes, disk_usage0, disk_usage1, number_of_logged_in_users, memory_usage0, memory_usage1, system_uptime, ip_address)
 
     # Send the message to the user
-    bot.send_message(message.chat.id, srv_info, parse_mode="HTML")
+    bot.send_message(message.chat.id, srv_info, parse_mode="HTML", reply_markup=keyboard)
 
 
 ## Розмір директорії із записами розмови
 @bot.message_handler(commands=['size_rec'])
 def size_rec(message):
     mondir_size = os.popen("du -h --max-depth=2 /var/spool/asterisk/monitor/ | sort -k2").read().strip()
-    bot.send_message(message.chat.id, f"<code>[ Розмір директорій із записами розмови ]\n\n{mondir_size}</code>", parse_mode="HTML")
+    bot.send_message(message.chat.id, f"<code>[ Розмір директорій із записами розмови ]\n\n{mondir_size}</code>", parse_mode="HTML", reply_markup=keyboard)
 
 
 ## Список найбільших директорій
 @bot.message_handler(commands=['big_dir'])
 def big_dir(message):
     bigdir_size = os.popen("du -h -d2 --exclude=proc / | sort -k2 | egrep '^([0-9]{2,3}|[0-9]{1}.[0-9]{1})G'").read().strip()
-    bot.send_message(message.chat.id, f"<code>[ Список найбільших директорій ]\n\n{bigdir_size}</code>", parse_mode="HTML")
+    bot.send_message(message.chat.id, f"<code>[ Список найбільших директорій ]\n\n{bigdir_size}</code>", parse_mode="HTML", reply_markup=keyboard)
 
 
 ## Пошук відповідального менеджера в CRM Sales Drive.
@@ -84,6 +84,7 @@ def get_manager(message):
     bot.send_message(message.chat.id, "Введіть номер телефону клієнта:")
     bot.register_next_step_handler(message, process_phone_number)
 
+@bot.message_handler(func=lambda message: True)
 def process_phone_number(message):
     phone_number = message.text.strip()
     if phone_number.startswith('/'):
@@ -105,13 +106,13 @@ def process_phone_number(message):
             client_name = f"{client.get('fName', 'Unknown')} {client.get('lName', '')}"
 
             result_message = f"ПІБ: {client_name}\nВідповідальний: {manager_name} [{internal_number}]"
-            bot.reply_to(message, result_message)
+            bot.reply_to(message, result_message, reply_markup=keyboard)
         elif data["status"] == "error" and data["massage"] == "Not found.":
-            bot.reply_to(message, "Немає заявок або контактів із цим номером.")
+            bot.reply_to(message, "Немає заявок або контактів із цим номером.", reply_markup=keyboard)
         else:
-            bot.reply_to(message, "Неможливо отримати інформацію про менеджера.")
+            bot.reply_to(message, "Неможливо отримати інформацію про менеджера.", reply_markup=keyboard)
     else:
-        bot.reply_to(message, "Некоректний номер телефону!")
+        bot.reply_to(message, "Некоректний номер телефону!", reply_markup=keyboard)
 
 def normalize_phone_number(phone_number):
     cleaned_number = re.sub(r'^(?:\+?380|0)(\(\)\s-)$', '', phone_number)
@@ -142,7 +143,7 @@ def pbx_peers(message):
 {}</code>
   """.format(peers1, peers2)
 
-    bot.send_message(message.chat.id, peers_info, parse_mode="HTML")
+    bot.send_message(message.chat.id, peers_info, parse_mode="HTML", reply_markup=keyboard)
 
 
 #"/pbx_queue"
@@ -152,7 +153,7 @@ def pbx_queue(message):
     for queue in queues:
         queue1 = os.popen(f"/usr/sbin/asterisk -rx'queue show {queue}' | head -n -1 | tail -n -3 | sed -e 's/([^()]*)//g' | awk '{{print $1, $5, $6}}'").read().strip()
         queue_info = f"<code>[  Статистика черги {queue}  ]\n {queue1} </code>"
-        bot.send_message(message.chat.id, queue_info, parse_mode="HTML")
+        bot.send_message(message.chat.id, queue_info, parse_mode="HTML", reply_markup=keyboard)
 
 
 #"/last_calls"
