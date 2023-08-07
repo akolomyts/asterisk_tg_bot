@@ -81,11 +81,11 @@ def big_dir(message):
 @bot.message_handler(commands=['get_manager'])
 def get_manager(message):
     bot.send_message(message.chat.id, "Введіть номер телефону клієнта:")
-    bot.register_next_step_handler(message, normalize_phone_number)
+    bot.register_next_step_handler(message, process_phone_number)
 
-def normalize_phone_number(message):
+def normalize_phone_number(phone_number):
     # Удаление всех символов, кроме цифр, пробелов, круглых скобок и дефисов
-    cleaned_number = re.sub(r'[^\d\s()\-.]', '', message)
+    cleaned_number = re.sub(r'[^\d\s()\-.]', '', phone_number)
     
     # Извлечение только цифр из номера
     digits = re.sub(r'\D', '', cleaned_number)
@@ -94,35 +94,36 @@ def normalize_phone_number(message):
     if len(digits) == 9:
         # Форматирование номера
         formatted_number = f'+380{digits}'
-        bot.send_message(message.chat.id, f"Відформатований номер {formatted_number}")
-        bot.register_next_step_handler(formatted_number, process_phone_number)
         return formatted_number
     else:
-        bot.send_message(message.chat.id, "Невірний формат номера")
-        get_manager()
+        return None
+#bot.send_message(message.chat.id, "Невірний формат номера")
+#get_manager()
 
-def process_phone_number(formatted_number):
-    phone_number = formatted_number.text
-    headers = {"Form-Api-Key": "FORM_API_KEY"}
-    url = f"https://YOUR_DOMAIN.salesdrive.me/api/get_manager_by_phone_number/?phone={phone_number}"
+def process_phone_number(message):
+    normalized_number = normalize_phone_number(message.text)
+    if normalized_number:
+        headers = {"Form-Api-Key": "FORM_API_KEY"}
+        url = f"https://YOUR_DOMAIN.salesdrive.me/api/get_manager_by_phone_number/?phone={normalized_number}"
 
-    response = requests.get(url, headers=headers)
-    data = response.json()
+        response = requests.get(url, headers=headers)
+        data = response.json()
 
-    if data["status"] == "success":
-        manager = data["manager"]
-        client = data["client"]
-        manager_name = manager.get("name", "Невідомо")
-        internal_number = manager.get("internal_number", "Невідомо")
-        client_name = f"{client.get('fName', 'Unknown')} {client.get('lName', '')}"
+        if data["status"] == "success":
+            manager = data["manager"]
+            client = data["client"]
+            manager_name = manager.get("name", "Невідомо")
+            internal_number = manager.get("internal_number", "Невідомо")
+            client_name = f"{client.get('fName', 'Unknown')} {client.get('lName', '')}"
 
-        result_message = f"ФИО: {client_name}\nВідповідальний: {manager_name} [{internal_number}]"
-        bot.send_message(message.chat.id, result_message)
-    elif data["status"] == "error" and data["massage"] == "Not found.":
-        bot.send_message(message.chat.id, "Немає заявок або контактів із цим номером.")
+            result_message = f"ФИО: {client_name}\nВідповідальний: {manager_name} [{internal_number}]"
+            bot.send_message(message.chat.id, result_message)
+        elif data["status"] == "error" and data["massage"] == "Not found.":
+            bot.send_message(message.chat.id, "Немає заявок або контактів із цим номером.")
+        else:
+            bot.send_message(message.chat.id, "Неможливо отримати інформацію про менеджера.")
     else:
-        bot.send_message(message.chat.id, "Неможливо отримати інформацію про менеджера.")
-
+        bot.send_message(message.chat.id, "Некоректний номер телефону!")
 
 #"/pbx_peers"
 @bot.message_handler(commands=['pbx_peers'])
