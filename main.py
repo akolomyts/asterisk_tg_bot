@@ -10,7 +10,6 @@ bot = telebot.TeleBot(TOKEN)
 keyboard = types.ReplyKeyboardMarkup(row_width=4, resize_keyboard=True)
 buttons = [
     "/help", "/userid", "/server_info", "/size_rec",
-    "/get_manager", "/pbx_peers", "/pbx_queue", "/last_calls",
     "/get_manager", "/pbx_peers", "/pbx_queue", "/last_calls"
 ]
 keyboard.add(*buttons)
