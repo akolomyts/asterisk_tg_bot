@@ -104,11 +104,7 @@ def process_phone_number(message):
         bot.send_message(message.chat.id, "Немає заявок або контактів із цим номером.")
     else:
         bot.send_message(message.chat.id, "Неможливо отримати інформацію про менеджера.")
-else:
-    bot.send_message(message.chat.id, "Некоректний номер телефону!")
-
-
-
+        
 
 #"/pbx_peers"
 @bot.message_handler(commands=['pbx_peers'])
