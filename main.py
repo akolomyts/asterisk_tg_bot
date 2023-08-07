@@ -150,9 +150,9 @@ def pbx_peers(message):
 def pbx_queue(message):
     queues = PBX_QUEUES
     for queue in queues:
-        queue1 = os.popen(f"/usr/sbin/asterisk -rx'queue show {queue}' | grep {queue}").read().strip()
-        queue2 = os.popen(f"/usr/sbin/asterisk -rx'queue show {queue}' | grep -i Local | sed -e 's/([^()]*)//g' | awk '{{print $1, \t, $5, \t, $6}}'").read().strip()
-        queue_info = f"<code>[  Статистика черги {queue}  ]\n {queue1} \n{queue2}</code>"
+        queue1 = os.popen(f"/usr/sbin/asterisk -rx'queue show {queue}' | grep {queue}  | awk -F',' '{{print $4, $5, $6}}'").read().strip()
+        queue2 = os.popen(f"/usr/sbin/asterisk -rx'queue show {queue}' | grep -i Local | sed -e 's/([^()]*)//g' | awk '{{print $1, \"\\t\", $5, \"\\t\", $6}}'").read().strip()
+        queue_info = f"<code>[  Статистика черги {queue}  ]\n\n{queue1}</code>\n\n{queue2}"
         bot.send_message(message.chat.id, queue_info, parse_mode="HTML", reply_markup=keyboard)
 
 
