@@ -116,7 +116,6 @@ def process_phone_number(message):
 def normalize_phone_number(phone_number):
     cleaned_number = re.sub(r'^(?:\+?380|0)(\(\)\s-)$', '', phone_number)
     digits = re.sub(r'\D', '', cleaned_number)
-    print(f"\nafter regex {digits}")
 
     if len(digits) == 12:
         formatted_number = f'+{digits}'
