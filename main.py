@@ -114,6 +114,7 @@ def process_phone_number(message):
     else:
         bot.reply_to(message, "Некоректний номер телефону!", reply_markup=keyboard)
 
+@bot.message_handler(func=lambda message: True)
 def normalize_phone_number(phone_number):
     cleaned_number = re.sub(r'^(?:\+?380|0)(\(\)\s-)$', '', phone_number)
     digits = re.sub(r'\D', '', cleaned_number)
