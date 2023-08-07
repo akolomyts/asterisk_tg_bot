@@ -85,7 +85,10 @@ def get_manager(message):
     bot.register_next_step_handler(message, process_phone_number)
 
 def process_phone_number(message):
-    phone_number = message.text
+    phone_number = message.text.strip()
+    if phone_number.startswith('/'):
+        bot.reply_to(message, "Ви ввели некоректні дані. Будь ласка, введіть правильний номер телефону.")
+        return
     headers = {"Form-Api-Key": FORM_API_KEY}
     url = f"https://{YOUR_DOMAIN}.salesdrive.me/api/get_manager_by_phone_number/?phone={phone_number}"
 
