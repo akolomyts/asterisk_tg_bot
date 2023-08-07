@@ -119,7 +119,6 @@ def process_phone_number(message):
         else:
             bot.send_message(message.chat.id, "Неможливо отримати інформацію про менеджера.")
     else:
-        get_manager()
         bot.send_message(message.chat.id, "Некоректний номер телефону!")
 
 @bot.message_handler(commands=['get_manager'])
