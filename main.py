@@ -79,7 +79,7 @@ def big_dir(message):
 
 
 ## Пошук відповідального менеджера в CRM Sales Drive.
-@bot.message_handler(commands=['get_manager'], func=lambda message: True)
+@bot.message_handler(commands=['get_manager'])
 def get_manager(message):
     bot.send_message(message.chat.id, "Введіть номер телефону клієнта:")
     bot.register_next_step_handler(message, process_phone_number)
@@ -100,12 +100,11 @@ def process_phone_number(message):
         client_name = f"{client.get('fName', 'Unknown')} {client.get('lName', '')}"
 
         result_message = f"ПІБ: {client_name}\nВідповідальний: {manager_name} [{internal_number}]"
-        bot.send_message(message.chat.id, result_message)
+        bot.reply_to(message, result_message)
     elif data["status"] == "error" and data["massage"] == "Not found.":
-        bot.send_message(message.chat.id, "Немає заявок або контактів із цим номером.")
+        bot.reply_to(message, "Немає заявок або контактів із цим номером.")
     else:
-        bot.send_message(message.chat.id, "Неможливо отримати інформацію про менеджера.")
-        
+        bot.reply_to(message, "Неможливо отримати інформацію про менеджера.")
 
 #"/pbx_peers"
 @bot.message_handler(commands=['pbx_peers'])
@@ -137,6 +136,11 @@ def pbx_queue(message):
 
 
 #"/last_calls"
+
+        
+@bot.message_handler(func=lambda message: True)
+def echo_all(message):
+    bot.reply_to(message, message.text)
 
 
 def main():
