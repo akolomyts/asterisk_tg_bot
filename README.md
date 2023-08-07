@@ -8,6 +8,7 @@ asterisk_tg_bot
 ## Install
 - cd /srv
 - git clone https://github.com/akolomyts/asterisk_tg_bot.git
+- pip install pyTelegramBotAPI
 - cp ./telegram-bot.service /etc/systemd/system/
 - systemctl daemon-reload
-- systemctl restart telegram-bot.service
+- systemctl start telegram-bot.service
