@@ -85,8 +85,8 @@ def get_manager(message):
 
 def process_phone_number(message):
     phone_number = message.text
-    headers = {"Form-Api-Key": "FORM_API_KEY"}
-    url = f"https://YOUR_DOMAIN.salesdrive.me/api/get_manager_by_phone_number/?phone={phone_number}"
+    headers = {"Form-Api-Key": FORM_API_KEY}
+    url = f"https://{YOUR_DOMAIN}.salesdrive.me/api/get_manager_by_phone_number/?phone={phone_number}"
 
     response = requests.get(url, headers=headers)
     data = response.json()
