@@ -21,7 +21,7 @@ kb_main.add(*main_bts)
 
 kb_adm = types.ReplyKeyboardMarkup(row_width=3, resize_keyboard=True)
 adm_bts = ["/server_info", "/size_rec", "/big_dir",
-           "/pbx_peers", "/pbx_queue","⬅️back"]
+           "/pbx_peers", "/pbx_queue","⬅️ back"]
 kb_adm.add(*adm_bts)
             
 @bot.message_handler(commands=['start', 'help'])
@@ -42,8 +42,8 @@ def start(message):
 def get_user_text(message):
     if message.text == "admin_cmd":
         bot.send_message(message.chat.id, "admin_cmd", reply_markup=kb_adm)
-    elif message.text == "⬅️back":
-        bot.send_message(message.chat.id, reply_markup=kb_main)
+    elif message.text == "⬅️ back":
+        bot.send_message(message.chat.id, text="back" reply_markup=kb_main)
 
 @bot.message_handler(commands=['userid'])
 def userid(message):
