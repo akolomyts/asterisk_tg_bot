@@ -48,7 +48,7 @@ def get_user_text(message):
 @bot.message_handler(commands=['userid'])
 def userid(message):
     user_id = message.from_user.id
-     bot.reply_to(message, f"Ваш ID користувача: {user_id}", reply_markup=kb_main)
+    bot.reply_to(message, f"Ваш ID користувача: {user_id}", reply_markup=kb_main)
 
 ## Коротка інформація про сервер
 @bot.message_handler(commands=['server_info'])
