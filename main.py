@@ -36,19 +36,19 @@ def start(message):
     /pbx_peers - активні внутрішні/зовнішній номера
     /pbx_queue - статистика менеджерів у черзі
     /last_calls - декілька останніх дзвінків'''
-    bot.send_message(message.chat.id, f"Привіт!\nЯ телеграм бот 🤖 і можу надати деяку інформацію по серверу. \n{text_help}", reply_markup=kb_main)
+    bot.reply_to(message, f"Привіт!\nЯ телеграм бот 🤖 і можу надати деяку інформацію по серверу. \n{text_help}", reply_markup=kb_main)
 
 @bot.message_handler()
 def get_user_text(message):
     if message.text == "admin_cmd":
-        bot.reply_to(message.chat.id, "admin_cmd", reply_markup=kb_adm)
+        bot.reply_to(message, "admin_cmd", reply_markup=kb_adm)
     elif message.text == "⬅️ back":
-        bot.reply_to(message.chat.id, text="back", reply_markup=kb_main)
+        bot.reply_to(message, text="back", reply_markup=kb_main)
 
 @bot.message_handler(commands=['userid'])
 def userid(message):
     user_id = message.from_user.id
-    bot.send_message(message.chat.id, f"Ваш ID користувача: {user_id}", reply_markup=kb_main)
+     bot.reply_to(message, f"Ваш ID користувача: {user_id}", reply_markup=kb_main)
 
 ## Коротка інформація про сервер
 @bot.message_handler(commands=['server_info'])
@@ -77,27 +77,27 @@ def server_info(message):
     """.format(hostname, system_load, number_of_processes, disk_usage0, disk_usage1, number_of_logged_in_users, memory_usage0, memory_usage1, system_uptime, ip_address)
 
     # Send the message to the user
-    bot.send_message(message.chat.id, srv_info, parse_mode="HTML", reply_markup=kb_adm)
+    bot.reply_to(message, srv_info, parse_mode="HTML", reply_markup=kb_adm)
 
 
 ## Розмір директорії із записами розмови
 @bot.message_handler(commands=['size_rec'])
 def size_rec(message):
     mondir_size = os.popen("du -h --max-depth=2 /var/spool/asterisk/monitor/ | sort -k2").read().strip()
-    bot.send_message(message.chat.id, f"<code>[ Розмір директорій із записами розмови ]\n\n{mondir_size}</code>", parse_mode="HTML", reply_markup=kb_adm)
+    bot.reply_to(message, f"<code>[ Розмір директорій із записами розмови ]\n\n{mondir_size}</code>", parse_mode="HTML", reply_markup=kb_adm)
 
 
 ## Список найбільших директорій
 @bot.message_handler(commands=['big_dir'])
 def big_dir(message):
     bigdir_size = os.popen("du -h -d2 --exclude=proc / | sort -k2 | egrep '^([0-9]{2,3}|[0-9]{1}.[0-9]{1})G'").read().strip()
-    bot.send_message(message.chat.id, f"<code>[ Список найбільших директорій ]\n\n{bigdir_size}</code>", parse_mode="HTML", reply_markup=kb_adm)
+    bot.reply_to(message, f"<code>[ Список найбільших директорій ]\n\n{bigdir_size}</code>", parse_mode="HTML", reply_markup=kb_adm)
 
 
 ## Пошук відповідального менеджера в CRM Sales Drive.
 @bot.message_handler(commands=['get_manager'])
 def get_manager(message):
-    bot.send_message(message.chat.id, "Введіть номер телефону клієнта:")
+    bot.reply_to(message, "Введіть номер телефону клієнта:")
     bot.register_next_step_handler(message, process_phone_number)
 
 def process_phone_number(message):
