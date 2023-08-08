@@ -38,13 +38,6 @@ def start(message):
     /last_calls - декілька останніх дзвінків'''
     bot.reply_to(message, f"Привіт!\nЯ телеграм бот 🤖 і можу надати деяку інформацію по серверу. \n{text_help}", reply_markup=kb_main)
 
-@bot.message_handler()
-def get_user_text(message):
-    if message.text == "admin_cmd":
-        bot.reply_to(message, "admin_cmd", reply_markup=kb_adm)
-    elif message.text == "⬅️ back":
-        bot.reply_to(message, text="back", reply_markup=kb_main)
-
 @bot.message_handler(commands=['userid'])
 def userid(message):
     user_id = message.from_user.id
@@ -158,7 +151,7 @@ def pbx_peers(message):
 {}</code>
   """.format(peers1, peers2)
 
-    bot.send_message(message.chat.id, peers_info, parse_mode="HTML", reply_markup=kb_adm)
+    bot.reply_to(message, peers_info, parse_mode="HTML", reply_markup=kb_adm)
 
 
 #"/pbx_queue"
@@ -169,12 +162,19 @@ def pbx_queue(message):
         queue1 = os.popen(f"/usr/sbin/asterisk -rx'queue show {queue}' | grep {queue}  | awk -F',' '{{print $4, $5, $6}}'").read().strip()
         queue2 = os.popen(f"/usr/sbin/asterisk -rx'queue show {queue}' | grep -i Local | sed -e 's/([^()]*)//g' | awk '{{print $1, \"\\t\", $5, \"\\t\", $6}}'").read().strip()
         queue_info = f"<code>[  Статистика черги {queue}  ]\n\n{queue1}</code>\n\n{queue2}"
-        bot.send_message(message.chat.id, queue_info, parse_mode="HTML", reply_markup=kb_adm)
+        bot.reply_to(message, queue_info, parse_mode="HTML", reply_markup=kb_adm)
 
 
 #"/last_calls"
 
 
+
+@bot.message_handler()
+def get_user_text(message):
+    if message.text == "admin_cmd":
+        bot.reply_to(message, "admin_cmd", reply_markup=kb_adm)
+    elif message.text == "⬅️ back":
+        bot.reply_to(message, text="back", reply_markup=kb_main)
 
 def main():
     bot.polling(none_stop=True)
