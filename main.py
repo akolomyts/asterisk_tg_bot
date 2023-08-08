@@ -41,9 +41,9 @@ def start(message):
 @bot.message_handler()
 def get_user_text(message):
     if message.text == "admin_cmd":
-        bot.send_message(message.chat.id, "admin_cmd", reply_markup=kb_adm)
+        bot.reply_to(message.chat.id, "admin_cmd", reply_markup=kb_adm)
     elif message.text == "⬅️ back":
-        bot.send_message(message.chat.id, text="back", reply_markup=kb_main)
+        bot.reply_to(message.chat.id, text="back", reply_markup=kb_main)
 
 @bot.message_handler(commands=['userid'])
 def userid(message):
