@@ -160,13 +160,10 @@ def handle_commands(message):
     elif message.text.startswith('/pbx_peers'):
         peers1 = os.popen("/usr/sbin/asterisk -rx'sip show peers' | grep \"^380\"  | awk '{print $1\"\\t\"$2\"\\t\"$7\"\\t\"$8\" \"$9}' | awk -F'/' '{print $2}' | awk '{print \"[SIM \"NR\"]\", $0}'").read().strip()
         peers2 = os.popen("/usr/sbin/asterisk -rx'pjsip show contacts'| grep sip | sed 's/Contact:\\s*//; s/[0-9]*;ob.*[[:xdigit:]]\\s//g' | sed 's/Avail/OK/' | sed -E 's/(\\.[0-9]+)$/ms/' | awk -F'[/@: ]' '{ print \"[\"$5\"]\\t\"$6\"\\t\"$7\"\\t(\"$15\")\"}'").read().strip()
-
-        peers_info = """
-    <code>[  Статус номерів GSM  ]\n\n{}
-
-    [  Статус внутрішніх номерів АТС  ]\n\n{}</code>
-    """.format(peers1, peers2)
-
+        
+        peers_info = """[  Статус номерів GSM  ]\n\n<code>{}</code>\n
+[  Статус внутрішніх номерів АТС  ]\n\n<code>{}</code>
+        """.format(peers1, peers2)
         bot.reply_to(message, peers_info, parse_mode="HTML", reply_markup=kb_adm)
 
 
