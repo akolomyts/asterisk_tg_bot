@@ -140,7 +140,7 @@ def handle_commands(message):
     #@bot.message_handler(commands=['big_dir'])
     #def big_dir(message):
     elif message.text.startswith('/big_dir'):
-        bot.send_message(message, f"Йде підрахунок. Зачекайте будь-ласка", parse_mode="HTML", reply_markup=kb_adm)
+        bot.reply_to(message, f"Йде підрахунок. Зачекайте будь-ласка", parse_mode="HTML", reply_markup=kb_adm)
         bigdir_size = os.popen("du -h -d2 --exclude=proc / | sort -k2 | egrep '^([0-9]{2,3}|[0-9]{1}.[0-9]{1})G'").read().strip()
         bot.reply_to(message, f"<code>[ Список найбільших директорій ]\n\n{bigdir_size}</code>", parse_mode="HTML", reply_markup=kb_adm)
 
@@ -161,13 +161,9 @@ def handle_commands(message):
         peers2 = os.popen("/usr/sbin/asterisk -rx'pjsip show contacts'| grep sip | sed 's/Contact:\\s*//; s/[0-9]*;ob.*[[:xdigit:]]\\s//g' | sed 's/Avail/OK/' | sed -E 's/(\\.[0-9]+)$/ms/' | awk -F'[/@: ]' '{ print \"[\"$5\"]\\t\"$6\"\\t\"$7\"\\t(\"$15\")\"}'").read().strip()
 
         peers_info = """
-    <code>[  Статус номерів GSM  ]
+    <code>[  Статус номерів GSM  ]\n\n{}
 
-    {}
-
-    [  Статус внутрішніх номерів АТС  ]
-
-    {}</code>
+    [  Статус внутрішніх номерів АТС  ]\n\n{}</code>
     """.format(peers1, peers2)
 
         bot.reply_to(message, peers_info, parse_mode="HTML", reply_markup=kb_adm)
