@@ -19,7 +19,16 @@ kb_adm = types.ReplyKeyboardMarkup(row_width=3, resize_keyboard=True)
 adm_bts = ["/server_info", "/size_rec", "/big_dir",
            "/pbx_peers", "/pbx_queue","⬅️ back"]
 kb_adm.add(*adm_bts)
-            
+
+
+# Запис повідомленнь
+@bot.message_handler(func=lambda message: True)
+def log_messages(message):
+    with open(log_file_path, 'a') as log_file:
+        log_file.write(f"User {message.from_user.id}: {message.text}\n")
+
+
+## Старт або додівка по боту
 @bot.message_handler(commands=['start', 'help'])
 def start(message):
     text_help='''Ось список наявних команд:
@@ -34,10 +43,13 @@ def start(message):
     /last_calls - декілька останніх дзвінків'''
     bot.reply_to(message, f"Привіт!\nЯ телеграм бот 🤖 і можу надати деяку інформацію по серверу. \n{text_help}", reply_markup=kb_main)
 
+
+## ІД користувача
 @bot.message_handler(commands=['userid'])
 def userid(message):
     user_id = message.from_user.id
     bot.reply_to(message, f"Ваш ID користувача: {user_id}", reply_markup=kb_main)
+
 
 ## Коротка інформація про сервер
 @bot.message_handler(commands=['server_info'])
@@ -131,7 +143,8 @@ def normalize_phone_number(phone_number):
     else:
         return None
 
-#"/pbx_peers"
+
+## /pbx_peers
 @bot.message_handler(commands=['pbx_peers'])
 def pbx_peers(message):
     peers1 = os.popen("/usr/sbin/asterisk -rx'sip show peers' | grep \"^380\"  | awk '{print $1\"\\t\"$2\"\\t\"$7\"\\t\"$8\" \"$9}' | awk -F'/' '{print $2}' | awk '{print \"[SIM \"NR\"]\", $0}'").read().strip()
@@ -150,7 +163,7 @@ def pbx_peers(message):
     bot.reply_to(message, peers_info, parse_mode="HTML", reply_markup=kb_adm)
 
 
-#"/pbx_queue"
+## /pbx_queue
 @bot.message_handler(commands=['pbx_queue'])
 def pbx_queue(message):
     queues = PBX_QUEUES
@@ -161,7 +174,7 @@ def pbx_queue(message):
         bot.reply_to(message, queue_info, parse_mode="HTML", reply_markup=kb_adm)
 
 
-#"/last_calls"
+## /last_calls 
 
 
 
@@ -171,14 +184,6 @@ def get_user_text(message):
         bot.reply_to(message, "admin_cmd", reply_markup=kb_adm)
     elif message.text == "⬅️ back":
         bot.reply_to(message, text="back", reply_markup=kb_main)
-
-
-
-@bot.message_handler(func=lambda message: True)
-def log_messages(message):
-    with open(log_file_path, 'a') as log_file:
-        log_file.write(f"User {message.from_user.id}: {message.text}\n")
-
 
 def main():
     bot.polling(none_stop=True)
