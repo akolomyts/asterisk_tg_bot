@@ -183,7 +183,7 @@ def handle_commands(message):
     #@bot.message_handler(commands=['last_calls'])
     #def last_calls(message):
     elif message.text.startswith('/last_calls'):
-        bot.reply_to(message, f"Функція у розробці", parse_mode="HTML", reply_markup=kb_adm)
+        bot.reply_to(message, f"Функція у розробці", parse_mode="HTML", reply_markup=kb_main)
 
 
 @bot.message_handler()
