@@ -24,7 +24,7 @@ kb_adm.add(*adm_bts)
 
 def process_phone_number(message):
     phone_number = message.text.strip()
-    handle_commands(message.text)
+    handle_commands(message)
     if phone_number.startswith('/'):
         bot.reply_to(message, "Ви ввели некоректні дані. Будь ласка, введіть правильний номер телефону.")
         return
