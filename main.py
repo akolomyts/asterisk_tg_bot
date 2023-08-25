@@ -32,8 +32,8 @@ def handle_commands(message):
 
     ## Старт або додівка по боту
     #@bot.message_handler(commands=['start', 'help'])
-    if message.text.startswith('/help'):
     #def start(message):
+    if message.text.startswith('/help'):
         text_help='''Ось список наявних команд:
         /help - довідка по командам
         /userid - ID користувача
@@ -48,15 +48,16 @@ def handle_commands(message):
 
     ## ІД користувача
     #@bot.message_handler(commands=['userid'])
+    #def userid(message):
     elif message.text.startswith('/userid'):
-        def userid(message):
-            user_id = message.from_user.id
-            bot.reply_to(message, f"Ваш ID користувача: {user_id}", reply_markup=kb_main)
+        user_id = message.from_user.id
+        bot.reply_to(message, f"Ваш ID користувача: {user_id}", reply_markup=kb_main)
 
 
     ## Коротка інформація про сервер
-    @bot.message_handler(commands=['server_info'])
-    def server_info(message):
+    #@bot.message_handler(commands=['server_info'])
+    #def server_info(message):
+    elif message.text.startswith('/server_info'):
         hostname = os.popen("hostname").read().strip()
         system_load = os.popen("cat /proc/loadavg | cut -d \" \" -f1").read().strip()
         number_of_processes = os.popen("ps aux | wc -l").read().strip()
@@ -85,71 +86,75 @@ def handle_commands(message):
 
 
     ## Розмір директорії із записами розмови
-    @bot.message_handler(commands=['size_rec'])
-    def size_rec(message):
+    #@bot.message_handler(commands=['size_rec'])
+    #def size_rec(message):
+    elif message.text.startswith('/size_rec'):
         mondir_size = os.popen("du -h --max-depth=2 /var/spool/asterisk/monitor/ | sort -k2").read().strip()
         bot.reply_to(message, f"<code>[ Розмір директорій із записами розмови ]\n\n{mondir_size}</code>", parse_mode="HTML", reply_markup=kb_adm)
 
 
     ## Список найбільших директорій
-    @bot.message_handler(commands=['big_dir'])
-    def big_dir(message):
+    #@bot.message_handler(commands=['big_dir'])
+    #def big_dir(message):
+    elif message.text.startswith('/big_dir'):
         bigdir_size = os.popen("du -h -d2 --exclude=proc / | sort -k2 | egrep '^([0-9]{2,3}|[0-9]{1}.[0-9]{1})G'").read().strip()
         bot.reply_to(message, f"<code>[ Список найбільших директорій ]\n\n{bigdir_size}</code>", parse_mode="HTML", reply_markup=kb_adm)
 
 
     ## Пошук відповідального менеджера в CRM Sales Drive.
-    @bot.message_handler(commands=['get_manager'])
-    def get_manager(message):
+    #@bot.message_handler(commands=['get_manager'])
+    #def get_manager(message):
+    elif message.text.startswith('/get_manager'):
         bot.reply_to(message, "Введіть номер телефону клієнта:")
         bot.register_next_step_handler(message, process_phone_number)
 
-    def process_phone_number(message):
-        phone_number = message.text.strip()
-        if phone_number.startswith('/'):
-            bot.reply_to(message, "Ви ввели некоректні дані. Будь ласка, введіть правильний номер телефону.")
-            return
-        phone_number = normalize_phone_number(message.text)
-        if phone_number:
-            headers = {"Form-Api-Key": FORM_API_KEY}
-            url = f"https://{YOUR_DOMAIN}.salesdrive.me/api/get_manager_by_phone_number/?phone={phone_number}"
+        def process_phone_number(message):
+            phone_number = message.text.strip()
+            if phone_number.startswith('/'):
+                bot.reply_to(message, "Ви ввели некоректні дані. Будь ласка, введіть правильний номер телефону.")
+                return
+            phone_number = normalize_phone_number(message.text)
+            if phone_number:
+                headers = {"Form-Api-Key": FORM_API_KEY}
+                url = f"https://{YOUR_DOMAIN}.salesdrive.me/api/get_manager_by_phone_number/?phone={phone_number}"
 
-            response = requests.get(url, headers=headers)
-            data = response.json()
+                response = requests.get(url, headers=headers)
+                data = response.json()
 
-            if data["status"] == "success":
-                manager = data["manager"]
-                client = data["client"]
-                manager_name = manager.get("name", "Невідомо")
-                internal_number = manager.get("internal_number", "Невідомо")
-                client_name = f"{client.get('fName', 'Unknown')} {client.get('lName', '')}"
+                if data["status"] == "success":
+                    manager = data["manager"]
+                    client = data["client"]
+                    manager_name = manager.get("name", "Невідомо")
+                    internal_number = manager.get("internal_number", "Невідомо")
+                    client_name = f"{client.get('fName', 'Unknown')} {client.get('lName', '')}"
 
-                result_message = f"ПІБ: {client_name}\nВідповідальний: {manager_name} [{internal_number}]"
-                bot.reply_to(message, result_message, reply_markup=kb_main)
-            elif data["status"] == "error" and data["massage"] == "Not found.":
-                bot.reply_to(message, "Немає заявок або контактів із цим номером.", reply_markup=kb_main)
+                    result_message = f"ПІБ: {client_name}\nВідповідальний: {manager_name} [{internal_number}]"
+                    bot.reply_to(message, result_message, reply_markup=kb_main)
+                elif data["status"] == "error" and data["massage"] == "Not found.":
+                    bot.reply_to(message, "Немає заявок або контактів із цим номером.", reply_markup=kb_main)
+                else:
+                    bot.reply_to(message, "Неможливо отримати інформацію про менеджера.", reply_markup=kb_main)
             else:
-                bot.reply_to(message, "Неможливо отримати інформацію про менеджера.", reply_markup=kb_main)
-        else:
-            bot.reply_to(message, "Некоректний номер телефону!", reply_markup=kb_main)
+                bot.reply_to(message, "Некоректний номер телефону!", reply_markup=kb_main)
 
-    def normalize_phone_number(phone_number):
-        cleaned_number = re.sub(r'^(?:\+?380|0)(\(\)\s-)$', '', phone_number)
-        digits = re.sub(r'\D', '', cleaned_number)
+        def normalize_phone_number(phone_number):
+            cleaned_number = re.sub(r'^(?:\+?380|0)(\(\)\s-)$', '', phone_number)
+            digits = re.sub(r'\D', '', cleaned_number)
 
-        if len(digits) == 12:
-            formatted_number = f'+{digits}'
-            return formatted_number
-        elif len(digits) == 10:
-            formatted_number = f'+38{digits}'
-            return formatted_number
-        else:
-            return None
+            if len(digits) == 12:
+                formatted_number = f'+{digits}'
+                return formatted_number
+            elif len(digits) == 10:
+                formatted_number = f'+38{digits}'
+                return formatted_number
+            else:
+                return None
 
 
     ## /pbx_peers
-    @bot.message_handler(commands=['pbx_peers'])
-    def pbx_peers(message):
+    #@bot.message_handler(commands=['pbx_peers'])
+    #def pbx_peers(message):
+    elif message.text.startswith('/pbx_peers'):
         peers1 = os.popen("/usr/sbin/asterisk -rx'sip show peers' | grep \"^380\"  | awk '{print $1\"\\t\"$2\"\\t\"$7\"\\t\"$8\" \"$9}' | awk -F'/' '{print $2}' | awk '{print \"[SIM \"NR\"]\", $0}'").read().strip()
         peers2 = os.popen("/usr/sbin/asterisk -rx'pjsip show contacts'| grep sip | sed 's/Contact:\\s*//; s/[0-9]*;ob.*[[:xdigit:]]\\s//g' | sed 's/Avail/OK/' | sed -E 's/(\\.[0-9]+)$/ms/' | awk -F'[/@: ]' '{ print \"[\"$5\"]\\t\"$6\"\\t\"$7\"\\t(\"$15\")\"}'").read().strip()
 
@@ -167,8 +172,9 @@ def handle_commands(message):
 
 
     ## /pbx_queue
-    @bot.message_handler(commands=['pbx_queue'])
-    def pbx_queue(message):
+    #@bot.message_handler(commands=['pbx_queue'])
+    #def pbx_queue(message):
+    elif message.text.startswith('/pbx_queue'):
         queues = PBX_QUEUES
         for queue in queues:
             queue1 = os.popen(f"/usr/sbin/asterisk -rx'queue show {queue}' | grep {queue}  | awk -F',' '{{print $4, $5, $6}}'").read().strip()
@@ -178,7 +184,10 @@ def handle_commands(message):
 
 
     ## /last_calls 
-
+    #@bot.message_handler(commands=['last_calls'])
+    #def last_calls(message):
+    elif message.text.startswith('/last_calls'):
+        bot.reply_to(message, f"Функція у розробці", parse_mode="HTML", reply_markup=kb_adm)
 
 
 @bot.message_handler()
