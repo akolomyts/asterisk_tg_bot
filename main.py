@@ -10,13 +10,6 @@ bot = telebot.TeleBot(TOKEN)
 # Шлях до файлу, до якого записуватимуться повідомлення
 log_file_path = 'messages_log.txt'
 
-@bot.message_handler(func=lambda message: True)
-def log_messages(message):
-    with open(log_file_path, 'a') as log_file:
-        log_file.write(f"User {message.from_user.id}: {message.text}\n")
-
-
-
 # Створюємо клавіатуру з кнопками
 kb_main = types.ReplyKeyboardMarkup(row_width=3, resize_keyboard=True)
 main_bts = ["/get_manager", "/last_calls", "admin_cmd"]
@@ -178,6 +171,14 @@ def get_user_text(message):
         bot.reply_to(message, "admin_cmd", reply_markup=kb_adm)
     elif message.text == "⬅️ back":
         bot.reply_to(message, text="back", reply_markup=kb_main)
+
+
+
+@bot.message_handler(func=lambda message: True)
+def log_messages(message):
+    with open(log_file_path, 'a') as log_file:
+        log_file.write(f"User {message.from_user.id}: {message.text}\n")
+
 
 def main():
     bot.polling(none_stop=True)
