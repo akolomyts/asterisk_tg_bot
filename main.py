@@ -22,6 +22,49 @@ adm_bts = ["/server_info", "/size_rec", "/big_dir",
 kb_adm.add(*adm_bts)
 
 
+def process_phone_number(message):
+    phone_number = message.text.strip()
+    if phone_number.startswith('/'):
+        bot.reply_to(message, "Ви ввели некоректні дані. Будь ласка, введіть правильний номер телефону.")
+        return
+    phone_number = normalize_phone_number(message.text)
+    if phone_number:
+        headers = {"Form-Api-Key": FORM_API_KEY}
+        url = f"https://{YOUR_DOMAIN}.salesdrive.me/api/get_manager_by_phone_number/?phone={phone_number}"
+
+        response = requests.get(url, headers=headers)
+        data = response.json()
+
+        if data["status"] == "success":
+            manager = data["manager"]
+            client = data["client"]
+            manager_name = manager.get("name", "Невідомо")
+            internal_number = manager.get("internal_number", "Невідомо")
+            client_name = f"{client.get('fName', 'Unknown')} {client.get('lName', '')}"
+
+            result_message = f"ПІБ: {client_name}\nВідповідальний: {manager_name} [{internal_number}]"
+            bot.reply_to(message, result_message, reply_markup=kb_main)
+        elif data["status"] == "error" and data["massage"] == "Not found.":
+            bot.reply_to(message, "Немає заявок або контактів із цим номером.", reply_markup=kb_main)
+        else:
+            bot.reply_to(message, "Неможливо отримати інформацію про менеджера.", reply_markup=kb_main)
+    else:
+        bot.reply_to(message, "Некоректний номер телефону!", reply_markup=kb_main)
+
+def normalize_phone_number(phone_number):
+    cleaned_number = re.sub(r'^(?:\+?380|0)(\(\)\s-)$', '', phone_number)
+    digits = re.sub(r'\D', '', cleaned_number)
+
+    if len(digits) == 12:
+        formatted_number = f'+{digits}'
+        return formatted_number
+    elif len(digits) == 10:
+        formatted_number = f'+38{digits}'
+        return formatted_number
+    else:
+        return None
+
+
 # Запис повідомленнь
 @bot.message_handler(commands=['help', 'userid', 'server_info', 'size_rec', 'big_dir', 'get_manager', 'pbx_peers', 'pbx_queue', 'last_calls'])
 def handle_commands(message):
@@ -97,6 +140,7 @@ def handle_commands(message):
     #@bot.message_handler(commands=['big_dir'])
     #def big_dir(message):
     elif message.text.startswith('/big_dir'):
+        bot.send_message(message, f"<b>Йде підрахунок. Зачекайте будь-ласка</b>", parse_mode="HTML", reply_markup=kb_adm)
         bigdir_size = os.popen("du -h -d2 --exclude=proc / | sort -k2 | egrep '^([0-9]{2,3}|[0-9]{1}.[0-9]{1})G'").read().strip()
         bot.reply_to(message, f"<code>[ Список найбільших директорій ]\n\n{bigdir_size}</code>", parse_mode="HTML", reply_markup=kb_adm)
 
