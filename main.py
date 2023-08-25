@@ -140,7 +140,7 @@ def handle_commands(message):
     #@bot.message_handler(commands=['big_dir'])
     #def big_dir(message):
     elif message.text.startswith('/big_dir'):
-        bot.send_message(message, f"<b>Йде підрахунок. Зачекайте будь-ласка</b>", parse_mode="HTML", reply_markup=kb_adm)
+        bot.send_message(message, f"Йде підрахунок. Зачекайте будь-ласка", parse_mode="HTML", reply_markup=kb_adm)
         bigdir_size = os.popen("du -h -d2 --exclude=proc / | sort -k2 | egrep '^([0-9]{2,3}|[0-9]{1}.[0-9]{1})G'").read().strip()
         bot.reply_to(message, f"<code>[ Список найбільших директорій ]\n\n{bigdir_size}</code>", parse_mode="HTML", reply_markup=kb_adm)
 
