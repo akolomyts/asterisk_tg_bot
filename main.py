@@ -22,10 +22,12 @@ kb_adm.add(*adm_bts)
 
 
 # Запис повідомленнь
-@bot.message_handler(func=lambda message: True)
+#@bot.message_handler(func=lambda message: True)
+@bot.message_handler(func=lambda message: not message.text.startswith('/'))
 def log_messages(message):
+    current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     with open(log_file_path, 'a') as log_file:
-        log_file.write(f"User {message.from_user.id}: {message.text}\n")
+        log_file.write(f"{current_time}\t{message.from_user.id}\t{message.text}\n")
 
 
 ## Старт або додівка по боту
