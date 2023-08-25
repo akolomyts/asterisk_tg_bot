@@ -23,7 +23,7 @@ kb_adm.add(*adm_bts)
 
 
 # Запис повідомленнь
-@bot.message_handler(commands=['get_manager', 'server_info', 'userid'])
+@bot.message_handler(commands=['help', 'userid', 'server_info', 'size_rec', 'big_dir', 'get_manager', 'pbx_peers', 'pbx_queue', 'last_calls'])
 def handle_commands(message):
     current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     with open(log_file_path, 'a') as log_file:
