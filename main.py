@@ -108,48 +108,6 @@ def handle_commands(message):
         bot.reply_to(message, "Введіть номер телефону клієнта:")
         bot.register_next_step_handler(message, process_phone_number)
 
-        def process_phone_number(message):
-            phone_number = message.text.strip()
-            if phone_number.startswith('/'):
-                bot.reply_to(message, "Ви ввели некоректні дані. Будь ласка, введіть правильний номер телефону.")
-                return
-            phone_number = normalize_phone_number(message.text)
-            if phone_number:
-                headers = {"Form-Api-Key": FORM_API_KEY}
-                url = f"https://{YOUR_DOMAIN}.salesdrive.me/api/get_manager_by_phone_number/?phone={phone_number}"
-
-                response = requests.get(url, headers=headers)
-                data = response.json()
-
-                if data["status"] == "success":
-                    manager = data["manager"]
-                    client = data["client"]
-                    manager_name = manager.get("name", "Невідомо")
-                    internal_number = manager.get("internal_number", "Невідомо")
-                    client_name = f"{client.get('fName', 'Unknown')} {client.get('lName', '')}"
-
-                    result_message = f"ПІБ: {client_name}\nВідповідальний: {manager_name} [{internal_number}]"
-                    bot.reply_to(message, result_message, reply_markup=kb_main)
-                elif data["status"] == "error" and data["massage"] == "Not found.":
-                    bot.reply_to(message, "Немає заявок або контактів із цим номером.", reply_markup=kb_main)
-                else:
-                    bot.reply_to(message, "Неможливо отримати інформацію про менеджера.", reply_markup=kb_main)
-            else:
-                bot.reply_to(message, "Некоректний номер телефону!", reply_markup=kb_main)
-
-        def normalize_phone_number(phone_number):
-            cleaned_number = re.sub(r'^(?:\+?380|0)(\(\)\s-)$', '', phone_number)
-            digits = re.sub(r'\D', '', cleaned_number)
-
-            if len(digits) == 12:
-                formatted_number = f'+{digits}'
-                return formatted_number
-            elif len(digits) == 10:
-                formatted_number = f'+38{digits}'
-                return formatted_number
-            else:
-                return None
-
 
     ## /pbx_peers
     #@bot.message_handler(commands=['pbx_peers'])
