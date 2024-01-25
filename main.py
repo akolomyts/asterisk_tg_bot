@@ -23,15 +23,15 @@ kb_adm.add(*adm_bts)
 
 
 def process_phone_number(message):
-    phone_number = message.text.strip()
+    usertext = message.text.strip()
     handle_commands(message)
-    if phone_number.startswith('/'):
-        bot.reply_to(message, "Ви ввели некоректні дані. Будь ласка, введіть правильний номер телефону.")
-        return
-    phone_number = normalize_phone_number(message.text)
-    if phone_number:
+    #if usertext.startswith('/'):
+    #    bot.reply_to(message, "Ви ввели некоректні дані. Будь ласка, введіть правильний номер телефону.")
+    #    return
+    usertext = normalize_phone_number(message.text)
+    if usertext:
         headers = {"Form-Api-Key": FORM_API_KEY}
-        url = f"https://{YOUR_DOMAIN}.salesdrive.me/api/get_manager_by_phone_number/?phone={phone_number}"
+        url = f"https://{YOUR_DOMAIN}.salesdrive.me/api/get_manager_by_phone_number/?phone={usertext}"
 
         response = requests.get(url, headers=headers)
         data = response.json()
@@ -49,11 +49,11 @@ def process_phone_number(message):
             bot.reply_to(message, "Немає заявок або контактів із цим номером.", reply_markup=kb_main)
         else:
             bot.reply_to(message, "Неможливо отримати інформацію про менеджера.", reply_markup=kb_main)
-    else:
-        bot.reply_to(message, "Некоректний номер телефону!", reply_markup=kb_main)
+#    else:
+ #       bot.reply_to(message, "Некоректний номер телефону!!!!", reply_markup=kb_main)
 
-def normalize_phone_number(phone_number):
-    cleaned_number = re.sub(r'^(?:\+?380|0)(\(\)\s-)$', '', phone_number)
+def normalize_phone_number(usertext):
+    cleaned_number = re.sub(r'^(?:\+?380|0)(\(\)\s-)$', '', usertext)
     digits = re.sub(r'\D', '', cleaned_number)
 
     if len(digits) == 12:
@@ -73,10 +73,7 @@ def handle_commands(message):
     with open(log_file_path, 'a') as log_file:
         log_file.write(f"{current_time}\t{message.from_user.id}\t{message.text}\n")
 
-
     ## Старт або додівка по боту
-    #@bot.message_handler(commands=['start', 'help'])
-    #def start(message):
     if message.text.startswith('/help'):
         text_help='''Ось список наявних команд:
         /help - довідка по командам
@@ -91,16 +88,11 @@ def handle_commands(message):
         bot.reply_to(message, f"Привіт!\nЯ телеграм бот 🤖 і можу надати деяку інформацію по серверу. \n{text_help}", reply_markup=kb_main)
 
     ## ІД користувача
-    #@bot.message_handler(commands=['userid'])
-    #def userid(message):
     elif message.text.startswith('/userid'):
         user_id = message.from_user.id
         bot.reply_to(message, f"Ваш ID користувача: {user_id}", reply_markup=kb_main)
 
-
     ## Коротка інформація про сервер
-    #@bot.message_handler(commands=['server_info'])
-    #def server_info(message):
     elif message.text.startswith('/server_info'):
         hostname = os.popen("hostname").read().strip()
         system_load = os.popen("cat /proc/loadavg | cut -d \" \" -f1").read().strip()
@@ -128,35 +120,23 @@ def handle_commands(message):
         # Send the message to the user
         bot.reply_to(message, srv_info, parse_mode="HTML", reply_markup=kb_adm)
 
-
     ## Розмір директорії із записами розмови
-    #@bot.message_handler(commands=['size_rec'])
-    #def size_rec(message):
     elif message.text.startswith('/size_rec'):
         mondir_size = os.popen("du -h --max-depth=2 /var/spool/asterisk/monitor/ | sort -k2").read().strip()
         bot.reply_to(message, f"<code>[ Розмір директорій із записами розмови ]\n\n{mondir_size}</code>", parse_mode="HTML", reply_markup=kb_adm)
 
-
     ## Список найбільших директорій
-    #@bot.message_handler(commands=['big_dir'])
-    #def big_dir(message):
     elif message.text.startswith('/big_dir'):
         bot.send_message(message.chat.id, f"Йде підрахунок. Зачекайте будь-ласка", parse_mode="HTML", reply_markup=kb_adm)
         bigdir_size = os.popen("du -h -d2 --exclude=proc / | sort -k2 | egrep '^([0-9]{2,3}|[0-9]{1}.[0-9]{1})G'").read().strip()
         bot.reply_to(message, f"<code>[ Список найбільших директорій ]\n\n{bigdir_size}</code>", parse_mode="HTML", reply_markup=kb_adm)
 
-
     ## Пошук відповідального менеджера в CRM Sales Drive.
-    #@bot.message_handler(commands=['get_manager'])
-    #def get_manager(message):
     elif message.text.startswith('/get_manager'):
         bot.reply_to(message, "Введіть номер телефону клієнта:")
         bot.register_next_step_handler(message, process_phone_number)
 
-
     ## /pbx_peers
-    #@bot.message_handler(commands=['pbx_peers'])
-    #def pbx_peers(message):
     elif message.text.startswith('/pbx_peers'):
         peers1 = os.popen("/usr/sbin/asterisk -rx'sip show peers' | grep \"^380\"  | awk '{print $1\"\\t\"$2\"\\t\"$7\"\\t\"$8\" \"$9}' | awk -F'/' '{print $2}' | awk '{print \"[SIM \"NR\"]\", $0}'").read().strip()
         peers2 = os.popen("/usr/sbin/asterisk -rx'pjsip show contacts'| grep sip | sed 's/Contact:\\s*//; s/[0-9]*;ob.*[[:xdigit:]]\\s//g' | sed 's/Avail/OK/' | sed -E 's/(\\.[0-9]+)$/ms/' | awk -F'[/@: ]' '{ print \"[\"$5\"]\\t\"$6\"\\t\"$7\"\\t(\"$15\")\"}'").read().strip()
@@ -166,10 +146,7 @@ def handle_commands(message):
         """.format(peers1, peers2)
         bot.reply_to(message, peers_info, parse_mode="HTML", reply_markup=kb_adm)
 
-
     ## /pbx_queue
-    #@bot.message_handler(commands=['pbx_queue'])
-    #def pbx_queue(message):
     elif message.text.startswith('/pbx_queue'):
         queues = PBX_QUEUES
         for queue in queues:
@@ -178,24 +155,28 @@ def handle_commands(message):
             queue_info = f"<code>[  Статистика черги {queue}  ]\n\n{queue1}</code>\n\n{queue2}"
             bot.reply_to(message, queue_info, parse_mode="HTML", reply_markup=kb_adm)
 
-
     ## /last_calls 
-    #@bot.message_handler(commands=['last_calls'])
-    #def last_calls(message):
     elif message.text.startswith('/last_calls'):
         bot.reply_to(message, f"Функція у розробці", parse_mode="HTML", reply_markup=kb_main)
 
+@bot.message_handler(func=lambda message: True)
+def handle_all_messages(message):
+    # if re.match(r'^\d{10,12}$', message.text):
 
-@bot.message_handler()
-def get_user_text(message):
+    # else:
+    #     bot.send_message(message.chat.id, f"Исключение else")
+
+#@bot.message_handler()
+#def get_user_text(message):
     if message.text == "admin_cmd":
         bot.reply_to(message, "admin_cmd", reply_markup=kb_adm)
     elif message.text == "⬅️ back":
         bot.reply_to(message, text="back", reply_markup=kb_main)
+    else:
+        process_phone_number(message)
 
 def main():
     bot.polling(none_stop=True)
 
 if __name__ == '__main__':
     main()
-
