@@ -9,6 +9,9 @@ asterisk_tg_bot
 - cd /srv
 - git clone https://github.com/akolomyts/asterisk_tg_bot.git
 - pip install pyTelegramBotAPI
+- cd ./asterisk_tg_bot
+- cp ./config.py.example ./config.py
+- edit config.py and write your tokens
 - cp ./telegram-bot.service /etc/systemd/system/
 - systemctl daemon-reload
 - systemctl start telegram-bot.service
