@@ -29,10 +29,16 @@ def process_phone_number(message):
     #    bot.reply_to(message, "Ви ввели некоректні дані. Будь ласка, введіть правильний номер телефону.")
     #    return
     usertext = normalize_phone_number(message.text)
+<<<<<<< HEAD
     try:
         if usertext:
             headers = {"Form-Api-Key": FORM_API_KEY}
             url = f"https://{YOUR_DOMAIN}.salesdrive.me/api/get_manager_by_phone_number/?phone={usertext}"
+=======
+    if usertext:
+        headers = {"Form-Api-Key": FORM_API_KEY}
+        url = f"https://{YOUR_DOMAIN}.salesdrive.me/api/get_manager_by_phone_number/?phone={usertext}"
+>>>>>>> 34b6a0d1287de22f63a53a5667af398255ff5e32
 
             response = requests.get(url, headers=headers)
             data = response.json()
@@ -50,6 +56,7 @@ def process_phone_number(message):
                     manager_name = "Невідомо"
                     internal_number = "Невідомо"
 
+<<<<<<< HEAD
                 if "client" in data:
                     client = data["client"]
                     client_name = f"{client.get('fName', 'Unknown')} {client.get('lName', '')}"
@@ -67,6 +74,17 @@ def process_phone_number(message):
     except Exception as e:
         print(f"Request to the Telegram API was with error: {e}")
 
+=======
+            result_message = f"ПІБ: {client_name}\nВідповідальний: {manager_name} [{internal_number}]"
+            bot.reply_to(message, result_message, reply_markup=kb_main)
+        elif data["status"] == "error" and data["massage"] == "Not found.":
+            bot.reply_to(message, "Немає заявок або контактів із цим номером.", reply_markup=kb_main)
+        else:
+            bot.reply_to(message, "Неможливо отримати інформацію про менеджера.", reply_markup=kb_main)
+#    else:
+ #       bot.reply_to(message, "Некоректний номер телефону!!!!", reply_markup=kb_main)
+
+>>>>>>> 34b6a0d1287de22f63a53a5667af398255ff5e32
 def normalize_phone_number(usertext):
     cleaned_number = re.sub(r'^(?:\+?380|0)(\(\)\s-)$', '', usertext)
     digits = re.sub(r'\D', '', cleaned_number)
@@ -176,6 +194,16 @@ def handle_commands(message):
 
 @bot.message_handler(func=lambda message: True)
 def handle_all_messages(message):
+<<<<<<< HEAD
+=======
+    # if re.match(r'^\d{10,12}$', message.text):
+
+    # else:
+    #     bot.send_message(message.chat.id, f"Исключение else")
+
+#@bot.message_handler()
+#def get_user_text(message):
+>>>>>>> 34b6a0d1287de22f63a53a5667af398255ff5e32
     if message.text == "admin_cmd":
         bot.reply_to(message, "admin_cmd", reply_markup=kb_adm)
     elif message.text == "⬅️ back":
@@ -188,4 +216,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
